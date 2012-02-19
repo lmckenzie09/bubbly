@@ -3,12 +3,8 @@ import random
 from collections import defaultdict
 from sys import argv, exit
 
-def 
-
-
 def print_graph(graph,size):
-    maze = list()
-    maze.append(' ')
+    maze = list(' ')
     
     for x in range(size):
         maze.append('_ ')
@@ -29,33 +25,21 @@ def print_graph(graph,size):
     maze_printout = ''.join(maze)
     print (maze_printout)
 
-if __name__ == "__main__":
-    if len(argv) < 2:
-        print ('Usage: maze_gen length_of_side_of_maze')
-        exit(1)
-    
-    size = int(argv[1])
-    
-    if size < 4 or size%2 == 1:
-        print ('Incorrect size. Must be even. Min: 6')
-        exit(1)
+def add_cycles(graph, size):
+    for i in range(size):
+        for j in range(size):
+            if len(graph[(i,j)]) < 3:
+                chance = random.randint(1,10)
+                if chance > 9:
+                    for node in [(i+1,j),(i-1,j),(i,j+1),(i,j-1)]:
+                        if node in graph:
+                            graph[(i,j)].add(node)
+                            graph[node].add((i,j))
+                        break
 
-    visited = set()
-    neighbors = defaultdict(set)
+def make_maze(graph, neighbors):
     next_set = set()
-    graph = defaultdict(set)
-
-    for node in [(x,y) for x in range(size) for y in range(size)]:
-        x, y = node
-        if x != 0:
-            neighbors[node].add((x-1,y))
-        if y != 0:
-            neighbors[node].add((x,y-1))
-        if x != size-1:
-            neighbors[node].add((x+1,y))
-        if y != size-1:
-            neighbors[node].add((x,y+1))
-
+    visited = set()
     start = (0,0)
     second = (0,1)
     graph[start].add(second)
@@ -77,5 +61,36 @@ if __name__ == "__main__":
                     graph[next_node].add(n)
                     graph[n].add(next_node)
                     break            
+
+def build_graph(neighbors, size):
+    for node in [(x,y) for x in range(size) for y in range(size)]:
+        x, y = node
+        if x != 0:
+            neighbors[node].add((x-1,y))
+        if y != 0:
+            neighbors[node].add((x,y-1))
+        if x != size-1:
+            neighbors[node].add((x+1,y))
+        if y != size-1:
+            neighbors[node].add((x,y+1))
+
+if __name__ == "__main__":
+    if len(argv) < 2:
+        print ('Usage: maze_gen length_of_side_of_maze')
+        exit(1)
+
+    size = int(argv[1])
+
+    if size < 6 or size%2 == 1:
+        print ('Incorrect size. Must be even. Min: 6')
+        exit(1)
+
+    neighbors = defaultdict(set)
+    graph = defaultdict(set)
+    
+    build_graph(neighbors, size)
+
+    make_maze(graph, neighbors)
     add_cycles(graph, size)
+
     print_graph(graph,size)
