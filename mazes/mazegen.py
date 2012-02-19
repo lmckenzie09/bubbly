@@ -3,6 +3,9 @@ import random
 from collections import defaultdict
 from sys import argv, exit
 
+def 
+
+
 def print_graph(graph,size):
     maze = list()
     maze.append(' ')
@@ -69,5 +72,5 @@ if __name__ == "__main__":
                     graph[next_node].add(n)
                     graph[n].add(next_node)
                     break            
-
+    add_cycles(graph, size)
     print_graph(graph,size)
